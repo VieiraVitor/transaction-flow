@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: transaction-service
+    depends_on:
+      - db
+      - migrate
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: transactions
+    networks:
+      - backend
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transactions
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - postgres_data:/var/lib/postgresql/
+  
+  migrate:
+    image: migrate/migrate:latest
+    container_name: migrate
+    depends_on:
+      - db
+    volumes:
+      - ./db/migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://postgres:postgres@db:5432/transactions?sslmode=disable",
+      "up"
+    ]
+    restart: on-failure
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  postgres_data:
