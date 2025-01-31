@@ -5,24 +5,24 @@ import (
 	"time"
 
 	"github.com/VieiraVitor/transaction-flow/internal/domain"
-	accountRepository "github.com/VieiraVitor/transaction-flow/internal/infra/repository/account"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 )
 
-type AccountUseCase struct {
-	repo accountRepository.Repository
+type accountUseCase struct {
+	repo repository.AccountRepository
 }
 
-func NewAccountUseCase(repo accountRepository.Repository) *AccountUseCase {
-	return &AccountUseCase{
+func NewAccountUseCase(repo repository.AccountRepository) AccountUseCase {
+	return &accountUseCase{
 		repo: repo,
 	}
 }
 
-func (a *AccountUseCase) CreateAccount(ctx context.Context, documentNumber string) (int, error) {
+func (a *accountUseCase) CreateAccount(ctx context.Context, documentNumber string) (int64, error) {
 	account := domain.NewAccount(documentNumber, time.Now())
 	return a.repo.CreateAccount(ctx, account)
 }
 
-func (a *AccountUseCase) GetAccount(ctx context.Context, accountID int64) (*domain.Account, error) {
+func (a *accountUseCase) GetAccount(ctx context.Context, accountID int64) (*domain.Account, error) {
 	return a.repo.GetAccount(ctx, accountID)
 }

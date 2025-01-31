@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/VieiraVitor/transaction-flow/pkg/logger"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 	"github.com/google/uuid"
 )
 

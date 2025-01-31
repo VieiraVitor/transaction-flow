@@ -3,34 +3,41 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/VieiraVitor/transaction-flow/internal/domain"
-	"github.com/VieiraVitor/transaction-flow/pkg/logger"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 )
 
-type AccountRepository struct {
+var ErrDuplicateAccount = errors.New("account already exists")
+
+type accountRepository struct {
 	db *sql.DB
 }
 
-func NewAccountRepository(db *sql.DB) *AccountRepository {
-	return &AccountRepository{db: db}
+func NewAccountRepository(db *sql.DB) *accountRepository {
+	return &accountRepository{db: db}
 }
 
-func (r *AccountRepository) CreateAccount(ctx context.Context, account domain.Account) (int, error) {
+func (r *accountRepository) CreateAccount(ctx context.Context, account domain.Account) (int64, error) {
 	query := "INSERT INTO accounts (document_number, created_at) VALUES ($1, NOW()) RETURNING id"
-	var id int
+	var id int64
 	row := r.db.QueryRow(query, account.DocumentNumber)
 	err := row.Scan(&id)
 	if err != nil {
+		if err.Error() == `pq: duplicate key value violates unique constraint "accounts_document_number_key"` {
+			logger.Logger.Error("account already exists", slog.String("error", err.Error()))
+			return 0, ErrDuplicateAccount
+		}
 		logger.Logger.Error("error creating account", slog.String("error", err.Error()))
 		return 0, fmt.Errorf("failed to create account: %w", err)
 	}
 	return id, err
 }
 
-func (r *AccountRepository) GetAccount(ctx context.Context, accountID int64) (*domain.Account, error) {
+func (r *accountRepository) GetAccount(ctx context.Context, accountID int64) (*domain.Account, error) {
 	query := "SELECT id, document_number, created_at FROM accounts WHERE id = $1"
 	row := r.db.QueryRow(query, accountID)
 
@@ -47,7 +54,7 @@ func (r *AccountRepository) GetAccount(ctx context.Context, accountID int64) (*d
 	return &account, err
 }
 
-func (r *AccountRepository) scanAccount(row *sql.Row) (domain.Account, error) {
+func (r *accountRepository) scanAccount(row *sql.Row) (domain.Account, error) {
 	var (
 		id             sql.NullInt64
 		documentNumber sql.NullString

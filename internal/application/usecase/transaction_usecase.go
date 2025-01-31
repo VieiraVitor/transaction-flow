@@ -2,22 +2,37 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/VieiraVitor/transaction-flow/internal/domain"
-	transactionRepository "github.com/VieiraVitor/transaction-flow/internal/infra/repository/transaction"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 )
 
-type TransactionUseCase struct {
-	repo transactionRepository.Repository
+type transactionUseCase struct {
+	repo repository.TransactionRepository
 }
 
-func NewTransactionUseCase(repo transactionRepository.Repository) *TransactionUseCase {
-	return &TransactionUseCase{
+func NewTransactionUseCase(repo repository.TransactionRepository) TransactionUseCase {
+	return &transactionUseCase{
 		repo: repo,
 	}
 }
 
-func (t *TransactionUseCase) CreateTransaction(ctx context.Context, accountID int, operationTypeID int, amount float64) (int, error) {
-	transaction := domain.NewTransaction(accountID, operationTypeID, amount)
+func (t *transactionUseCase) CreateTransaction(ctx context.Context, accountID int64, operationTypeID int, amount float64) (int64, error) {
+	operationType := domain.OperationType(operationTypeID)
+
+	if !operationType.IsValid() {
+		return 0, fmt.Errorf("invalid operation type: %v", operationType)
+	}
+
+	if operationType.IsPayment() && amount < 0 {
+		amount = -amount
+	}
+
+	if operationType.PurchaseOrWithdraw() && amount > 0 {
+		amount = -amount
+	}
+
+	transaction := domain.NewTransaction(accountID, operationType, amount)
 	return t.repo.CreateTransaction(ctx, transaction)
 }

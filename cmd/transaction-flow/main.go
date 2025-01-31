@@ -1,42 +1,37 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	handler "github.com/VieiraVitor/transaction-flow/internal/api/handlers"
+	"github.com/VieiraVitor/transaction-flow/config"
+	"github.com/VieiraVitor/transaction-flow/internal/api/handler"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
-	accountrepository "github.com/VieiraVitor/transaction-flow/internal/infra/repository/account"
-	transactionrepository "github.com/VieiraVitor/transaction-flow/internal/infra/repository/transaction"
-	"github.com/VieiraVitor/transaction-flow/pkg/logger"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/database"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 	_ "github.com/lib/pq"
-	"golang.org/x/exp/slog"
 )
 
 func main() {
 	logger.InitLogger()
-	logger.Logger.Info("Starting...")
-	dataSourceName := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		"db",
-		5432,
-		"postgres",
-		"postgres",
-		"transactions",
-	)
 
-	db, err := sql.Open("postgres", dataSourceName)
+	cfg := config.LoadConfig()
+
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		logger.Logger.Error("Failed to connect to database", slog.String("error", err.Error()))
 		log.Fatal(err)
 	}
 
 	defer db.Close()
 
-	accountRepo := accountrepository.NewAccountRepository(db)
-	transactionRepo := transactionrepository.NewTransactionRepository(db)
+	accountRepo := repository.NewAccountRepository(db)
+	transactionRepo := repository.NewTransactionRepository(db)
 
 	accountUseCase := usecase.NewAccountUseCase(accountRepo)
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo)
@@ -46,6 +41,31 @@ func main() {
 		transactionUseCase,
 	)
 	routes := handlers.NewRoutes()
-	logger.Logger.Info("Server started", slog.String("url", "http://localhost:8080"))
-	log.Fatal(http.ListenAndServe(":8080", routes))
+
+	server := &http.Server{
+		Addr:    cfg.AppPort,
+		Handler: routes,
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		logger.Logger.Info("Server started", "url", "http://localhost:8080")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Logger.Error("Failed to start server", "error", err.Error())
+		}
+	}()
+
+	<-stop
+	logger.Logger.Info("Signal received. Stopping...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Logger.Error("Failed to stop server", "error", err.Error())
+	} else {
+		logger.Logger.Info("Sever finished successfully")
+	}
 }

@@ -12,19 +12,19 @@ type Handlers struct {
 }
 
 func NewHandlers(
-	accountUC *usecase.AccountUseCase,
-	transactionUC *usecase.TransactionUseCase,
+	accountUseCase usecase.AccountUseCase,
+	transactionUseCase usecase.TransactionUseCase,
 ) *Handlers {
 	return &Handlers{
-		accountHandler:     NewAccountHandler(accountUC),
-		transactionHandler: NewTransactionHandler(transactionUC),
+		accountHandler:     NewAccountHandler(accountUseCase),
+		transactionHandler: NewTransactionHandler(transactionUseCase),
 	}
 }
 
 func (h *Handlers) NewRoutes() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Use(middleware.LoggingMiddleware)
+	r.Use(middleware.LoggingMiddleware, middleware.RecoverMiddleware)
 
 	r.Route("/accounts", func(r chi.Router) {
 		r.Post("/", h.accountHandler.CreateAccount)
