@@ -41,7 +41,7 @@ func TestTransactionRepositorySuite(t *testing.T) {
 func (s *TransactionRepositoryTestSuite) TestTransactionRepository_CreateTransaction_WhenValidInput_ShouldReturnId() {
 	// Arrange
 	transaction := domain.NewTransaction(int64(1), 1, 100)
-	s.mock.ExpectQuery("INSER INTO transactions").
+	s.mock.ExpectQuery("INSERT INTO transactions").
 		WithArgs(transaction.AccountID, transaction.OperationTypeID, transaction.Amount).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
@@ -60,7 +60,7 @@ func (s *TransactionRepositoryTestSuite) TestTransactionRepository_CreateTransac
 	transaction := domain.NewTransaction(int64(1), 1, 100)
 	expectedError := errors.New("failed to create transaction")
 
-	s.mock.ExpectQuery("INSER INTO transactions").
+	s.mock.ExpectQuery("INSERT INTO transactions").
 		WithArgs(transaction.AccountID, transaction.OperationTypeID, transaction.Amount).
 		WillReturnError(expectedError)
 
