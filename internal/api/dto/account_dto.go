@@ -8,6 +8,10 @@ type CreateAccountRequest struct {
 	DocumentNumber string `json:"document_number"`
 }
 
+type CreateAccountResponse struct {
+	ID int64 `json:"id"`
+}
+
 type GetAccountResponse struct {
 	AccountID      int64  `json:"account_id"`
 	DocumentNumber string `json:"document_number"`

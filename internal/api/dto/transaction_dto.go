@@ -8,6 +8,10 @@ type CreateTransactionRequest struct {
 	Amount          float64 `json:"amount"`
 }
 
+type CreateTransactionResponse struct {
+	ID int64 `json:"id"`
+}
+
 func (c *CreateTransactionRequest) Validate() error {
 	if c.AccountID == 0 {
 		return errors.New("accountID is mandatory")

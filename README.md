@@ -1,106 +1,112 @@
 # 🚀 Transaction Flow API
 
-## 📌 Sobre o Projeto
+## 📌 About the Project
 
-A **Transaction Flow API** é um sistema de gerenciamento de contas e transações, permitindo:
-- Criar contas associadas a um **document number**.
-- Recuperar informações de uma conta existente.
-- Registrar transações financeiras de diferentes tipos (**compras à vista, compras parceladas, saques e pagamentos**).
+The **Transaction Flow API** is an account and transaction management system that allows:
+- Creating accounts associated with a **document number**.
+- Retrieving information about an existing account.
+- Registering financial transactions of different types (**compras à vista, compras parceladas, saques e pagamentos**).
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Technologies Used
 
-Este projeto utiliza as seguintes tecnologias:
+This project uses the following technologies:
 
-- **[Go](https://go.dev/doc/)** - Linguagem de programação.
-- **[Chi Router](https://github.com/go-chi/chi)** - Roteamento leve e flexível para APIs HTTP.
-- **[PostgreSQL](https://www.postgresql.org/docs/)** - Banco de dados relacional.
-- **[Docker](https://docs.docker.com/)** - Containerização do projeto.
-- **[golang-migrate](https://github.com/golang-migrate/migrate)** - Gerenciamento de migrações de banco de dados.
-- **[Slog](https://pkg.go.dev/log/slog)** - Biblioteca para logging estruturado.
+- **[Go](https://go.dev/doc/)** - Programming language.
+- **[Chi Router](https://github.com/go-chi/chi)** - Lightweight and flexible routing for HTTP APIs.
+- **[PostgreSQL](https://www.postgresql.org/docs/)** - Relational database.
+- **[Docker](https://docs.docker.com/)** - Project containerization for easy setup.
+- **[Slog](https://pkg.go.dev/log/slog)** - Library for structured logging.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📂 Project Structure
 
 ```plaintext
 ├── cmd/
-│   ├── transaction-flow/        # Inicialização
-│   │   ├── main.go              
+│   ├── transaction-flow/        # Service entry point
+│   │   ├── main.go              # HTTP server initialization
 │
 ├── internal/
-│   ├── api/                     # Camada de interface HTTP
-│   │   ├── handlers/             # Handlers para requisições HTTP
+│   ├── api/                     # HTTP interface layer
+│   │   ├── handlers/             # Handlers for HTTP requests
 │   │   ├── middleware/           # Middlewares (logging, recovery)
-│   │   ├── dto/                  # Estruturas de requisição/resposta
-│   │   ├── response/              # Formatação de erros
+│   │   ├── dto/                  # Request/response structures
+│   │   ├── response/              # Error formatting
 │   │
-│   ├── application/             # Regras de negócio (use cases)
-│   │   ├── usecase/               # Casos de uso (Account, Transaction)
+│   ├── application/             # Business logic (use cases)
+│   │   ├── usecase/               # Use cases (Account, Transaction)
 │   │
-│   ├── domain/                  # Modelos de entidades e regras de domínio
+│   ├── domain/                  # Entity models and domain rules
 │   │   ├── account.go
 │   │   ├── transaction.go
 │   │
-│   ├── infra/                   # Camada de infraestrutura
-│   │   ├── repository/            # Acesso ao banco de dados
-│   │   ├── logger/                # Configuração de logs
+│   ├── infra/                   # Infrastructure layer
+│   │   ├── repository/            # Database access
+│   │   ├── logger/                # Logging configuration
 │   │
-├── migrations/                  # Arquivos SQL para criação e atualização do banco
+├── migrations/                  # SQL files for database creation and updates
+│   ├── 001_init.up.sql
 │
-├── config/                      # Configuração de envs do ambiente
+├── config/                      # Environment configuration
 │   ├── config.go
-│                
+│
+├── docker-compose.yml            # Docker configuration for development
+├── Dockerfile                    # Application container definition
+├── Makefile                      # Useful automation commands
+├── go.mod                        # Project dependencies
+├── README.md                     # Project documentation
 ```
 
 ---
 
-## 🚀 **Como rodar o projeto localmente**
+## 🚀 **How to Run the Project Locally**
 
-### **📌 Pré-requisitos**
+### **📌 Prerequisites**
 
-Antes de começar, você precisará ter instalado:
+Before you begin, you will need to have installed:
 
 - **[Docker](https://docs.docker.com/get-docker/)**
 - **[Docker Compose](https://docs.docker.com/compose/install/)**
 
-### **📌 Passo a passo**
+### **📌 Step by step**
 
-1️⃣ **Clone o repositório**
+1️⃣ **Clone the repository**
 ```bash
-git clone https://github.com/seu-usuario/transaction-flow.git
+git clone https://github.com/your-user/transaction-flow.git
 cd transaction-flow
 ```
 
-2️⃣ **Suba os containers do projeto (API, banco e migrations)**
+2️⃣ **Start the project containers (API, database, and migrations)**
 ```bash
 docker-compose up -d
 ```
-📌 Isso iniciará todos os serviços necessários, incluindo o banco de dados e a aplicação.
+📌 This will start the required services, including the database and application.
+
 
 ---
 
-## 🔥 **Endpoints da API**
+## 🔥 **API Endpoints**
 
-### **📌 Criar uma Conta**
+### **📌 Create an Account**
 📍 **POST** `/accounts`
 ```bash
 curl -X POST http://localhost:8080/accounts \
      -H "Content-Type: application/json" \
      -d '{"document_number": "12345678900"}'
 ```
-📌 **Resposta (201 Created)**
+📌 **Response (201 Created)**
 ```json
 {
   "id": 1
 }
 ```
 
-### **📌 Recuperar uma Conta**
+### **📌 Retrieve an Account**
 📍 **GET** `/accounts/{id}`
 ```bash
 curl -X GET http://localhost:8080/accounts/1
 ```
-📌 **Resposta (200 OK)**
+📌 **Response (200 OK)**
 ```json
 {
   "account_id": 1,
@@ -108,12 +114,10 @@ curl -X GET http://localhost:8080/accounts/1
 }
 ```
 
----
-
-### **📌 Criar uma Transação**
+### **📌 Create a Transaction**
 📍 **POST** `/transactions`
 ```bash
-curl --X POST 'http://localhost:8080/accounts' \
+curl --X POST http://localhost:8080/transactions \
      -H "Content-Type: application/json" \
      -d '{
             "account_id": 1,
@@ -121,7 +125,7 @@ curl --X POST 'http://localhost:8080/accounts' \
             "amount": 123.45
         }'
 ```
-📌 **Resposta (201 Created)**
+📌 **Response (201 Created)**
 ```json
 {
   "id": 10
@@ -130,20 +134,5 @@ curl --X POST 'http://localhost:8080/accounts' \
 
 ---
 
-## 🏗️ **Configuração do Ambiente**
-
-Se precisar configurar variáveis de ambiente, crie um arquivo **`.env`**:
-```ini
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=transactions
-SERVER_PORT=8080
-```
-📌 A API já lê automaticamente esse arquivo ao iniciar.
-
----
-
-## 📜 **Licença**
-Este projeto é distribuído sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+## 📜 **License**
+This project is distributed under the **MIT** license. See the [LICENSE](LICENSE) file for details.

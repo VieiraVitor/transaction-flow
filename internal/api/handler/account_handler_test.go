@@ -47,10 +47,10 @@ func TestAccountHandler_CreateAccount_WhenValidRequest_ShouldReturn201(t *testin
 	// Assert
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var id int64
-	err := json.Unmarshal(w.Body.Bytes(), &id)
+	var response dto.CreateAccountResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedID, id)
+	assert.Equal(t, expectedID, response.ID)
 }
 
 func TestAccountHandler_CreateAccount_WhenFailedToCreateAccount_ShouldReturn500(t *testing.T) {

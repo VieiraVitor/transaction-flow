@@ -38,6 +38,7 @@ func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	response := dto.CreateTransactionResponse{ID: transactionID}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(transactionID)
+	json.NewEncoder(w).Encode(response)
 }

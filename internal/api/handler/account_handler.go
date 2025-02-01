@@ -39,8 +39,9 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		response.SendErrorResponse(w, http.StatusInternalServerError, "could not create account", err.Error())
 		return
 	}
+	response := dto.CreateAccountResponse{ID: id}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(id)
+	json.NewEncoder(w).Encode(response)
 }
 
 func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {

@@ -46,10 +46,10 @@ func TestTransactionHandler_CreateTransaction_WhenValidRequest_ShouldReturn201(t
 	// Assert
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var id int64
-	err := json.Unmarshal(w.Body.Bytes(), &id)
+	var response dto.CreateTransactionResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedID, id)
+	assert.Equal(t, expectedID, response.ID)
 }
 
 func TestTransactionHandler_CreateTransaction_WhenInvalidRequest_ShouldReturn400(t *testing.T) {
