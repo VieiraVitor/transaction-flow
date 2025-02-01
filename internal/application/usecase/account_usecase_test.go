@@ -91,6 +91,7 @@ func TestAccountUseCase_GetAccount_WhenValidInput_ShouldReturnAccount(t *testing
 }
 
 func TestAccountUseCase_GetAccount_WhenFailedToGetAccount_ShouldReturnError(t *testing.T) {
+	// Arrange
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

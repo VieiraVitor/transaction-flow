@@ -14,7 +14,6 @@ type Config struct {
 	AppPort    string
 }
 
-// LoadConfig carrega as variáveis de ambiente
 func LoadConfig() *Config {
 	return &Config{
 		DBHost:     getEnv("DB_HOST", "localhost"),
