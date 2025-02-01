@@ -21,18 +21,23 @@ func NewTransactionHandler(useCase usecase.TransactionUseCase) *TransactionHandl
 }
 
 func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
-	var transactionRequest dto.CreateTransactionRequest
-	if err := json.NewDecoder(r.Body).Decode(&transactionRequest); err != nil {
-		response.SendErrorResponse(w, http.StatusBadRequest, err.Error(), "invalid request")
+	var req dto.CreateTransactionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.SendErrorResponse(w, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
 
-	transactionID, err := h.useCase.CreateTransaction(context.Background(), transactionRequest.AccountID, transactionRequest.OperationTypeID, transactionRequest.Amount)
+	if err := req.Validate(); err != nil {
+		response.SendErrorResponse(w, http.StatusUnprocessableEntity, "validation failed", err.Error())
+		return
+	}
+
+	transactionID, err := h.useCase.CreateTransaction(context.Background(), req.AccountID, req.OperationTypeID, req.Amount)
 	if err != nil {
-		response.SendErrorResponse(w, http.StatusInternalServerError, err.Error(), "could not create transaction")
+		response.SendErrorResponse(w, http.StatusInternalServerError, "could not create transaction", err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(transactionID)
 }

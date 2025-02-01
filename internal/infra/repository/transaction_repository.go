@@ -19,7 +19,7 @@ func NewTransactionRepository(db *sql.DB) *transactionRepository {
 }
 
 func (r *transactionRepository) CreateTransaction(ctx context.Context, transaction domain.Transaction) (int64, error) {
-	query := "INSER INTO transactions (account_id, operation_type_id, amount, event_date) VALUES($1, $2, $3, NOW()) RETURNING id"
+	query := "INSERT INTO transactions (account_id, operation_type_id, amount, event_date) VALUES($1, $2, $3, NOW()) RETURNING id"
 
 	var id int64
 	row := r.db.QueryRow(query, transaction.AccountID, transaction.OperationTypeID, transaction.Amount)

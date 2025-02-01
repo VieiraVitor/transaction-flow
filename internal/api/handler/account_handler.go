@@ -30,16 +30,12 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := req.Validate(); err != nil {
-		response.SendErrorResponse(w, http.StatusUnprocessableEntity, "validation error", err.Error())
+		response.SendErrorResponse(w, http.StatusUnprocessableEntity, "validation failed", err.Error())
 		return
 	}
 
 	id, err := h.useCase.CreateAccount(context.Background(), req.DocumentNumber)
 	if err != nil {
-		if errors.Is(err, repository.ErrDuplicateAccount) {
-			response.SendErrorResponse(w, http.StatusConflict, "Account already exists", err.Error())
-			return
-		}
 		response.SendErrorResponse(w, http.StatusInternalServerError, "could not create account", err.Error())
 		return
 	}
@@ -57,6 +53,10 @@ func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.useCase.GetAccount(context.Background(), accountID)
 	if err != nil {
+		if errors.Is(err, repository.ErrAccountNotFound) {
+			response.SendErrorResponse(w, http.StatusNotFound, "account not found", err.Error())
+			return
+		}
 		response.SendErrorResponse(w, http.StatusInternalServerError, "could not get account", err.Error())
 		return
 	}
