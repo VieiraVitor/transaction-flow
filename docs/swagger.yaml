@@ -1,0 +1,145 @@
+basePath: /
+definitions:
+  dto.CreateAccountRequest:
+    properties:
+      document_number:
+        type: string
+    type: object
+  dto.CreateAccountResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  dto.CreateTransactionRequest:
+    properties:
+      account_id:
+        type: integer
+      amount:
+        type: number
+      operation_type_id:
+        type: integer
+    type: object
+  dto.CreateTransactionResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  dto.GetAccountResponse:
+    properties:
+      account_id:
+        type: integer
+      document_number:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      description:
+        type: string
+      error:
+        type: string
+      status_code:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for account and transaction management
+  title: Transaction Flow API
+  version: "1.0"
+paths:
+  /accounts:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new account with a document number
+      parameters:
+      - description: Account Data
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Account ID
+          schema:
+            $ref: '#/definitions/dto.CreateAccountResponse'
+        "400":
+          description: Invalid Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: Account Already Exists
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create an account
+      tags:
+      - Accounts
+  /accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves account information using an account ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account Data
+          schema:
+            $ref: '#/definitions/dto.GetAccountResponse'
+        "400":
+          description: Invalid Account ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Account Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get account by ID
+      tags:
+      - Accounts
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new financial transaction
+      parameters:
+      - description: Transaction Data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Transaction ID
+          schema:
+            $ref: '#/definitions/dto.CreateTransactionResponse'
+        "400":
+          description: Invalid Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create a transaction
+      tags:
+      - Transactions
+schemes:
+- http
+swagger: "2.0"

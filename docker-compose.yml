@@ -39,7 +39,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./db/migrations:/migrations
+      - ./migrations:/migrations
     command: [
       "-path", "/migrations",
       "-database", "postgres://postgres:postgres@db:5432/transactions?sslmode=disable",

@@ -22,6 +22,17 @@ func NewAccountHandler(useCase usecase.AccountUseCase) *AccountHandler {
 	return &AccountHandler{useCase: useCase}
 }
 
+// CreateAccount godoc
+// @Summary Create an account
+// @Description Creates a new account with a document number
+// @Tags Accounts
+// @Accept  json
+// @Produce  json
+// @Param account body dto.CreateAccountRequest true "Account Data"
+// @Success 201 {object} dto.CreateAccountResponse "Account ID"
+// @Failure 400 {object} response.ErrorResponse "Invalid Request"
+// @Failure 409 {object} response.ErrorResponse "Account Already Exists"
+// @Router /accounts [post]
 func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateAccountRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -44,6 +55,17 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetAccount godoc
+// @Summary Get account by ID
+// @Description Retrieves account information using an account ID
+// @Tags Accounts
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Account ID"
+// @Success 200 {object} dto.GetAccountResponse "Account Data"
+// @Failure 400 {object} response.ErrorResponse "Invalid Account ID"
+// @Failure 404 {object} response.ErrorResponse "Account Not Found"
+// @Router /accounts/{id} [get]
 func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	accountID, err := strconv.ParseInt(idParam, 10, 64)

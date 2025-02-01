@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/VieiraVitor/transaction-flow/config"
+	_ "github.com/VieiraVitor/transaction-flow/docs"
 	"github.com/VieiraVitor/transaction-flow/internal/api/handler"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/database"
@@ -18,6 +19,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// @title Transaction Flow API
+// @version 1.0
+// @description API for account and transaction management
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func main() {
 	logger.InitLogger()
 

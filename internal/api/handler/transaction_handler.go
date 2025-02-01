@@ -20,6 +20,18 @@ func NewTransactionHandler(useCase usecase.TransactionUseCase) *TransactionHandl
 	}
 }
 
+// CreateTransaction godoc
+// @Summary Create a transaction
+// @Description Registers a new financial transaction
+// @Tags Transactions
+// @Accept  json
+// @Produce  json
+// @Param transaction body dto.CreateTransactionRequest true "Transaction Data"
+// @Success 201 {object} dto.CreateTransactionResponse "Transaction ID"
+// @Failure 400 {object} response.ErrorResponse "Invalid Request"
+// @Failure 422 {object} response.ErrorResponse "Validation Error"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateTransactionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
