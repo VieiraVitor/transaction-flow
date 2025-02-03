@@ -117,7 +117,7 @@ func (s *AccountRepositoryTestSuite) TestAccountRepository_GetAccount_WhenAccoun
 func (s *AccountRepositoryTestSuite) TestAccountRepository_GetAccount_WhenFailToGetAccount_ShouldReturnError() {
 	// Arrange
 	ctx := context.Background()
-	expectedError := errors.New("failed to create account")
+	expectedError := errors.New("failed to get account")
 
 	s.mock.ExpectQuery("SELECT id, document_number, created_at FROM accounts WHERE id = ?").
 		WithArgs(1).
@@ -129,5 +129,5 @@ func (s *AccountRepositoryTestSuite) TestAccountRepository_GetAccount_WhenFailTo
 	// Assert
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), account)
-	assert.Equal(s.T(), expectedError, err)
+	assert.ErrorContains(s.T(), err, expectedError.Error())
 }

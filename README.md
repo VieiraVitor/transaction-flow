@@ -25,36 +25,36 @@ This project uses the following technologies:
 ├── cmd/
 │   ├── transaction-flow/        # Service entry point
 │   │   ├── main.go              # HTTP server initialization
+│   
+├── config/                      # Environment configuration
+│   ├── config.go
 │
+├── docs/                        # API documentation (Swagger)
+│   
 ├── internal/
 │   ├── api/                     # HTTP interface layer
 │   │   ├── handlers/             # Handlers for HTTP requests
 │   │   ├── middleware/           # Middlewares (logging, recovery)
 │   │   ├── dto/                  # Request/response structures
-│   │   ├── response/              # Error formatting
+│   │   ├── response/             # Error formatting
 │   │
 │   ├── application/             # Business logic (use cases)
 │   │   ├── usecase/               # Use cases (Account, Transaction)
 │   │
 │   ├── domain/                  # Entity models and domain rules
-│   │   ├── account.go
-│   │   ├── transaction.go
 │   │
 │   ├── infra/                   # Infrastructure layer
 │   │   ├── repository/            # Database access
 │   │   ├── logger/                # Logging configuration
+│   │   ├── database/              # Connect to database
 │   │
+│   ├── tests/                   # Integration tests
+│   │   ├── integration/          # Integration test cases
+│   │   ├── testutils/            # Test utilities and setup
+│   │
+│
 ├── migrations/                  # SQL files for database creation and updates
-│   ├── 001_init.up.sql
 │
-├── config/                      # Environment configuration
-│   ├── config.go
-│
-├── docker-compose.yml            # Docker configuration for development
-├── Dockerfile                    # Application container definition
-├── Makefile                      # Useful automation commands
-├── go.mod                        # Project dependencies
-├── README.md                     # Project documentation
 ```
 
 ---
@@ -81,6 +81,13 @@ cd transaction-flow
 docker-compose up -d
 ```
 📌 This will start the required services, including the database and application.
+
+3️⃣ **Run all tests (including integration tests)**
+```bash
+docker-compose up -d  # Required to run integration tests
+go test ./...
+```
+📌 Running **integration tests** requires the database to be up and running via Docker Compose.
 
 
 ---
@@ -131,6 +138,10 @@ curl --X POST http://localhost:8080/transactions \
   "id": 10
 }
 ```
+
+## 📜 **Swagger UI**
+To view the API documentation, access (with the application running):
+📍 **Swagger UI:** [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
 ---
 

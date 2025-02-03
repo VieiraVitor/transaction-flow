@@ -24,7 +24,7 @@ func (o OperationType) IsPayment() bool {
 	return o == Pagamento
 }
 
-func (o OperationType) PurchaseOrWithdraw() bool {
+func (o OperationType) IsPurchaseOrWithdraw() bool {
 	return o == CompraAVista || o == CompraParcelada || o == Saque
 }
 

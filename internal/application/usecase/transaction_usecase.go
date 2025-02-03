@@ -29,7 +29,7 @@ func (t *transactionUseCase) CreateTransaction(ctx context.Context, accountID in
 		amount = -amount
 	}
 
-	if operationType.PurchaseOrWithdraw() && amount > 0 {
+	if operationType.IsPurchaseOrWithdraw() && amount > 0 {
 		amount = -amount
 	}
 

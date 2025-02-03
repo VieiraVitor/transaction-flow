@@ -1,6 +1,7 @@
-package handler
+package api
 
 import (
+	"github.com/VieiraVitor/transaction-flow/internal/api/handler"
 	"github.com/VieiraVitor/transaction-flow/internal/api/middleware"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
 	"github.com/go-chi/chi/v5"
@@ -8,8 +9,8 @@ import (
 )
 
 type Handlers struct {
-	accountHandler     *AccountHandler
-	transactionHandler *TransactionHandler
+	accountHandler     *handler.AccountHandler
+	transactionHandler *handler.TransactionHandler
 }
 
 func NewHandlers(
@@ -17,8 +18,8 @@ func NewHandlers(
 	transactionUseCase usecase.TransactionUseCase,
 ) *Handlers {
 	return &Handlers{
-		accountHandler:     NewAccountHandler(accountUseCase),
-		transactionHandler: NewTransactionHandler(transactionUseCase),
+		accountHandler:     handler.NewAccountHandler(accountUseCase),
+		transactionHandler: handler.NewTransactionHandler(transactionUseCase),
 	}
 }
 

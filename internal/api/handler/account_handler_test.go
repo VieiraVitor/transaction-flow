@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/VieiraVitor/transaction-flow/internal/api/dto"
+	"github.com/VieiraVitor/transaction-flow/internal/api/response"
 	"github.com/VieiraVitor/transaction-flow/internal/domain"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 	"github.com/VieiraVitor/transaction-flow/internal/mocks"
@@ -80,6 +81,12 @@ func TestAccountHandler_CreateAccount_WhenFailedToCreateAccount_ShouldReturn500(
 
 	// Assert
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, errorResponse.StatusCode)
+	assert.Equal(t, "could not create account", errorResponse.Error)
+	assert.Equal(t, "could not create account", errorResponse.Description)
 }
 
 func TestAccountHandler_CreateAccount_WhenDocumentNumberIsNull_ShouldReturn422(t *testing.T) {
@@ -103,6 +110,13 @@ func TestAccountHandler_CreateAccount_WhenDocumentNumberIsNull_ShouldReturn422(t
 
 	// Assert
 	assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusUnprocessableEntity, errorResponse.StatusCode)
+	assert.Equal(t, "validation failed", errorResponse.Error)
+	assert.Equal(t, "document_number is mandatory", errorResponse.Description)
+
 }
 
 func TestAccountHandler_CreateAccount_WhenRequestIsInvalid_ShouldReturn400(t *testing.T) {
@@ -126,12 +140,14 @@ func TestAccountHandler_CreateAccount_WhenRequestIsInvalid_ShouldReturn400(t *te
 	router.ServeHTTP(w, req)
 
 	// Assert
-	var responseData map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &responseData)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
 	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, errorResponse.StatusCode)
+	assert.Equal(t, "invalid request", errorResponse.Error)
+	assert.Equal(t, "invalid character 'a' after object key:value pair", errorResponse.Description)
 
-	assert.Contains(t, responseData, "error")
-	assert.Equal(t, "invalid request", responseData["error"])
 }
 
 func TestAccountHandler_GetAccount_ShouldReturn200_WhenAccountExists(t *testing.T) {
@@ -187,6 +203,13 @@ func TestAccountHandler_GetAccount_WhenNotFoundAccount_ShouldReturn404(t *testin
 
 	// Assert
 	assert.Equal(t, http.StatusNotFound, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusNotFound, errorResponse.StatusCode)
+	assert.Equal(t, "account not found", errorResponse.Error)
+	assert.Equal(t, "account not found", errorResponse.Description)
+
 }
 
 func TestAccountHandler_GetAccount_WhenFailedToGetAccount_ShouldReturn500(t *testing.T) {
@@ -197,7 +220,7 @@ func TestAccountHandler_GetAccount_WhenFailedToGetAccount_ShouldReturn500(t *tes
 	mockUseCase := mocks.NewMockAccountUseCase(ctrl)
 	hdlr := NewAccountHandler(mockUseCase)
 
-	errorExpected := errors.New("could not create account")
+	errorExpected := errors.New("could not get account")
 
 	mockUseCase.EXPECT().
 		GetAccount(context.Background(), int64(1)).
@@ -213,6 +236,13 @@ func TestAccountHandler_GetAccount_WhenFailedToGetAccount_ShouldReturn500(t *tes
 
 	// Assert
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, errorResponse.StatusCode)
+	assert.Equal(t, errorExpected.Error(), errorResponse.Error)
+	assert.Equal(t, errorExpected.Error(), errorResponse.Description)
+
 }
 
 func TestAccountHandler_GetAccount_WhenInvalidID_ShouldReturn400(t *testing.T) {
@@ -234,11 +264,11 @@ func TestAccountHandler_GetAccount_WhenInvalidID_ShouldReturn400(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	var responseData map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &responseData)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
 	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, errorResponse.StatusCode)
+	assert.Equal(t, "could not parse id", errorResponse.Error)
+	assert.Equal(t, "strconv.ParseInt: parsing \"abc\": invalid syntax", errorResponse.Description)
 
-	assert.Contains(t, responseData, "error")
-	assert.Equal(t, "could not parse id", responseData["error"].(string))
 }

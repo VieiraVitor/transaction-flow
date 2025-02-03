@@ -11,7 +11,7 @@ import (
 
 	"github.com/VieiraVitor/transaction-flow/config"
 	_ "github.com/VieiraVitor/transaction-flow/docs"
-	"github.com/VieiraVitor/transaction-flow/internal/api/handler"
+	"github.com/VieiraVitor/transaction-flow/internal/api"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/database"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
@@ -43,7 +43,7 @@ func main() {
 	accountUseCase := usecase.NewAccountUseCase(accountRepo)
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo)
 
-	handlers := handler.NewHandlers(
+	handlers := api.NewHandlers(
 		accountUseCase,
 		transactionUseCase,
 	)

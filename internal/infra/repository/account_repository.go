@@ -37,7 +37,8 @@ func (r *accountRepository) GetAccount(ctx context.Context, accountID int64) (*d
 	query := "SELECT id, document_number, created_at FROM accounts WHERE id = $1"
 	row := r.db.QueryRow(query, accountID)
 
-	if err := row.Err(); err != nil {
+	account, err := r.scanAccount(row)
+	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			logger.Logger.Error("account not found", slog.String("error", err.Error()))
 			return nil, ErrAccountNotFound
@@ -46,7 +47,7 @@ func (r *accountRepository) GetAccount(ctx context.Context, accountID int64) (*d
 		return nil, err
 	}
 
-	return r.scanAccount(row)
+	return account, nil
 }
 
 func (r *accountRepository) scanAccount(row *sql.Row) (*domain.Account, error) {

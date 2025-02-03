@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
@@ -21,14 +22,16 @@ func ConnectDB(cfg *config.Config) (*sql.DB, error) {
 	for i := 1; i <= 5; i++ {
 		db, err = sql.Open("postgres", dsn)
 		if err == nil {
-			err = db.Ping()
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			err = db.PingContext(ctx)
 			if err == nil {
 				return db, nil
 			}
 		}
 
 		fmt.Printf("Attempt %d: Failed to connect to database: %v\n", i, err)
-		time.Sleep(time.Duration(i) * time.Second) // Exponencial Backoff
+		time.Sleep(time.Duration(i*3) * time.Second) // Exponencial Backoff
 	}
 
 	return nil, fmt.Errorf("failed to connect to database after 5 attempts: %v", err)
