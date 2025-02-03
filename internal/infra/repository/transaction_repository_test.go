@@ -42,7 +42,7 @@ func (s *TransactionRepositoryTestSuite) TestTransactionRepository_CreateTransac
 	// Arrange
 	transaction := domain.NewTransaction(int64(1), 1, 100)
 	s.mock.ExpectQuery("INSERT INTO transactions").
-		WithArgs(transaction.AccountID, transaction.OperationTypeID, transaction.Amount).
+		WithArgs(transaction.AccountID(), transaction.OperationTypeID(), transaction.Amount(), transaction.EventDate()).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 	ctx := context.Background()
@@ -61,7 +61,7 @@ func (s *TransactionRepositoryTestSuite) TestTransactionRepository_CreateTransac
 	expectedError := errors.New("failed to create transaction")
 
 	s.mock.ExpectQuery("INSERT INTO transactions").
-		WithArgs(transaction.AccountID, transaction.OperationTypeID, transaction.Amount).
+		WithArgs(transaction.AccountID(), transaction.OperationTypeID(), transaction.Amount(), transaction.EventDate()).
 		WillReturnError(expectedError)
 
 	ctx := context.Background()

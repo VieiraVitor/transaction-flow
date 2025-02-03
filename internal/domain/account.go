@@ -3,14 +3,33 @@ package domain
 import "time"
 
 type Account struct {
-	ID             int64     `json:"id"`
-	DocumentNumber string    `json:"document_number"`
-	CreatedAt      time.Time `json:"created_at"`
+	id             int64
+	documentNumber string
+	createdAt      time.Time
 }
 
-func NewAccount(documentNumber string, createdAt time.Time) Account {
-	return Account{
-		DocumentNumber: documentNumber,
-		CreatedAt:      createdAt,
+func NewAccount(documentNumber string) *Account {
+	return &Account{
+		documentNumber: documentNumber,
 	}
+}
+
+func (a *Account) ID() int64 {
+	return a.id
+}
+
+func (a *Account) DocumentNumber() string {
+	return a.documentNumber
+}
+
+func (a *Account) CreatedAt() time.Time {
+	return a.createdAt
+}
+
+func (a *Account) SetID(id int64) {
+	a.id = id
+}
+
+func (a *Account) SetCreatedAt(createdAt time.Time) {
+	a.createdAt = createdAt
 }

@@ -69,25 +69,23 @@ func TestAccountUseCase_GetAccount_WhenValidInput_ShouldReturnAccount(t *testing
 	mockRepo := mocks.NewMockAccountRepository(ctrl)
 	accountUsecase := NewAccountUseCase(mockRepo)
 	ctx := context.Background()
-	accountExpected := &domain.Account{
-		ID:             int64(1),
-		DocumentNumber: "123456789",
-		CreatedAt:      time.Now(),
-	}
+	accountExpected := domain.NewAccount("123456789")
+	accountExpected.SetID(1)
+	accountExpected.SetCreatedAt(time.Now())
 
 	mockRepo.EXPECT().
-		GetAccount(gomock.Any(), accountExpected.ID).
+		GetAccount(gomock.Any(), accountExpected.ID()).
 		Return(accountExpected, nil)
 
 	// Act
-	account, err := accountUsecase.GetAccount(ctx, accountExpected.ID)
+	account, err := accountUsecase.GetAccount(ctx, accountExpected.ID())
 
 	// Assert
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
-	assert.Equal(t, account.ID, accountExpected.ID)
-	assert.Equal(t, account.DocumentNumber, accountExpected.DocumentNumber)
-	assert.Equal(t, account.CreatedAt, accountExpected.CreatedAt)
+	assert.Equal(t, account.ID(), accountExpected.ID())
+	assert.Equal(t, account.DocumentNumber(), accountExpected.DocumentNumber())
+	assert.Equal(t, account.CreatedAt(), accountExpected.CreatedAt())
 }
 
 func TestAccountUseCase_GetAccount_WhenFailedToGetAccount_ShouldReturnError(t *testing.T) {

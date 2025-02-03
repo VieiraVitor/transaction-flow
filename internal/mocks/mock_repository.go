@@ -36,7 +36,7 @@ func (m *MockAccountRepository) EXPECT() *MockAccountRepositoryMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockAccountRepository) CreateAccount(ctx context.Context, account domain.Account) (int64, error) {
+func (m *MockAccountRepository) CreateAccount(ctx context.Context, account *domain.Account) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateAccount", ctx, account)
 	ret0, _ := ret[0].(int64)

@@ -111,7 +111,7 @@ func TestGetAccount_WhenAccountExists_ShouldReturn200(t *testing.T) {
 	setup.Router.ServeHTTP(w, req)
 
 	// Assert
-	assert.Equal(t, http.StatusAccepted, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	var getResponse dto.GetAccountResponse
 	err = json.Unmarshal(w.Body.Bytes(), &getResponse)

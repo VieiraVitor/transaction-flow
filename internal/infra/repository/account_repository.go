@@ -21,13 +21,13 @@ func NewAccountRepository(db *sql.DB) *accountRepository {
 	return &accountRepository{db: db}
 }
 
-func (r *accountRepository) CreateAccount(ctx context.Context, account domain.Account) (int64, error) {
-	query := "INSERT INTO accounts (document_number, created_at) VALUES ($1, NOW()) RETURNING id"
+func (r *accountRepository) CreateAccount(ctx context.Context, account *domain.Account) (int64, error) {
+	query := "INSERT INTO accounts (document_number) VALUES ($1) RETURNING id"
 	var id int64
-	row := r.db.QueryRow(query, account.DocumentNumber)
+	row := r.db.QueryRow(query, account.DocumentNumber())
 	err := row.Scan(&id)
 	if err != nil {
-		logger.Logger.Error("error creating account", slog.String("document_number", account.DocumentNumber), slog.String("error", err.Error()))
+		logger.Logger.Error("error creating account", slog.String("document_number", account.DocumentNumber()), slog.String("error", err.Error()))
 		return 0, fmt.Errorf("failed to create account: %w", err)
 	}
 	return id, err
@@ -64,12 +64,11 @@ func (r *accountRepository) scanAccount(row *sql.Row) (*domain.Account, error) {
 	)
 
 	if err != nil {
-		return &domain.Account{}, fmt.Errorf("unable to scan account: %w", err)
+		return nil, fmt.Errorf("unable to scan account: %w", err)
 	}
 
-	return &domain.Account{
-		ID:             id.Int64,
-		DocumentNumber: documentNumber.String,
-		CreatedAt:      createdAt.Time,
-	}, nil
+	account := domain.NewAccount(documentNumber.String)
+	account.SetID(id.Int64)
+	account.SetCreatedAt(createdAt.Time)
+	return account, nil
 }

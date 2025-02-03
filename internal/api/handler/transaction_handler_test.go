@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTransactionHandler_CreateTransaction_WhenValidRequest_ShouldReturn201(t *testing.T) {
+func TestTransactionHandler_CreateTransaction_WhenTransactionCreatedSuccessfully_ShouldReturn201(t *testing.T) {
 	// Arrange
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

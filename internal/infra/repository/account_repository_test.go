@@ -43,10 +43,10 @@ func TestAccountRepositorySuite(t *testing.T) {
 func (s *AccountRepositoryTestSuite) TestAccountRepository_CreateAccount_WhenValidInput_ShouldReturnID() {
 	// Arrange
 	ctx := context.Background()
-	account := domain.NewAccount("12345678900", time.Now())
+	account := domain.NewAccount("12345678900")
 
 	s.mock.ExpectQuery("INSERT INTO accounts").
-		WithArgs(account.DocumentNumber).
+		WithArgs(account.DocumentNumber()).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 	// Act
@@ -61,11 +61,11 @@ func (s *AccountRepositoryTestSuite) TestAccountRepository_CreateAccount_WhenVal
 func (s *AccountRepositoryTestSuite) TestAccountRepository_CreateAccount_WhenFailedToCreateAccount_ShouldReturnError() {
 	// Arrange
 	ctx := context.Background()
-	account := domain.NewAccount("12345678900", time.Now())
+	account := domain.NewAccount("12345678900")
 	expectedError := errors.New("failed to create account")
 
 	s.mock.ExpectQuery("INSERT INTO accounts").
-		WithArgs(account.DocumentNumber).
+		WithArgs(account.DocumentNumber()).
 		WillReturnError(expectedError)
 
 	// Act
@@ -93,8 +93,8 @@ func (s *AccountRepositoryTestSuite) TestAccountRepository_GetAccount_WhenAccoun
 	// Assert
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), account)
-	assert.Equal(s.T(), int64(1), account.ID)
-	assert.Equal(s.T(), "12345678900", account.DocumentNumber)
+	assert.Equal(s.T(), int64(1), account.ID())
+	assert.Equal(s.T(), "12345678900", account.DocumentNumber())
 }
 
 func (s *AccountRepositoryTestSuite) TestAccountRepository_GetAccount_WhenAccountNotFound_ShouldReturnError() {

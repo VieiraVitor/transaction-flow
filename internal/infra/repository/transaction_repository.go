@@ -19,10 +19,10 @@ func NewTransactionRepository(db *sql.DB) *transactionRepository {
 }
 
 func (r *transactionRepository) CreateTransaction(ctx context.Context, transaction domain.Transaction) (int64, error) {
-	query := "INSERT INTO transactions (account_id, operation_type_id, amount, event_date) VALUES($1, $2, $3, NOW()) RETURNING id"
+	query := "INSERT INTO transactions (account_id, operation_type_id, amount, event_date) VALUES($1, $2, $3, $4) RETURNING id"
 
 	var id int64
-	row := r.db.QueryRow(query, transaction.AccountID, transaction.OperationTypeID, transaction.Amount)
+	row := r.db.QueryRow(query, transaction.AccountID(), transaction.OperationTypeID(), transaction.Amount(), transaction.EventDate())
 	err := row.Scan((&id))
 	if err != nil {
 		logger.Logger.Error("Error creating transaction", slog.String("error", err.Error()))

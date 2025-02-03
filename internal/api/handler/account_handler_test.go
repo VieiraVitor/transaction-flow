@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAccountHandler_CreateAccount_WhenValidRequest_ShouldReturn201(t *testing.T) {
+func TestAccountHandler_CreateAccount_WhenAccounCreatedSuccessfully_ShouldReturn201(t *testing.T) {
 	// Arrange
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -150,7 +150,7 @@ func TestAccountHandler_CreateAccount_WhenRequestIsInvalid_ShouldReturn400(t *te
 
 }
 
-func TestAccountHandler_GetAccount_ShouldReturn200_WhenAccountExists(t *testing.T) {
+func TestAccountHandler_GetAccount_WhenAccountExists_ShouldReturn200(t *testing.T) {
 	// Arrange
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -158,11 +158,12 @@ func TestAccountHandler_GetAccount_ShouldReturn200_WhenAccountExists(t *testing.
 	mockUseCase := mocks.NewMockAccountUseCase(ctrl)
 	hdlr := NewAccountHandler(mockUseCase)
 
-	account := dto.GetAccountResponse{AccountID: 1, DocumentNumber: "12345678900"}
+	account := domain.NewAccount("12345678900")
+	account.SetID(1)
 
 	mockUseCase.EXPECT().
 		GetAccount(context.Background(), int64(1)).
-		Return(&domain.Account{ID: 1, DocumentNumber: "12345678900"}, nil)
+		Return(account, nil)
 
 	router := chi.NewRouter()
 	router.Get("/accounts/{id}", hdlr.GetAccount)
@@ -173,12 +174,13 @@ func TestAccountHandler_GetAccount_ShouldReturn200_WhenAccountExists(t *testing.
 	router.ServeHTTP(w, req)
 
 	// Assert
-	assert.Equal(t, http.StatusAccepted, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	var response dto.GetAccountResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, account, response)
+	assert.Equal(t, account.ID(), response.AccountID)
+	assert.Equal(t, account.DocumentNumber(), response.DocumentNumber)
 }
 
 func TestAccountHandler_GetAccount_WhenNotFoundAccount_ShouldReturn404(t *testing.T) {

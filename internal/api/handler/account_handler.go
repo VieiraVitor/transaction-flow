@@ -85,9 +85,9 @@ func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accountResponse := &dto.GetAccountResponse{
-		AccountID:      account.ID,
-		DocumentNumber: account.DocumentNumber,
+		AccountID:      account.ID(),
+		DocumentNumber: account.DocumentNumber(),
 	}
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(accountResponse)
 }

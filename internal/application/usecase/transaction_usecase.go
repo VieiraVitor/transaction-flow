@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/VieiraVitor/transaction-flow/internal/domain"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
@@ -33,6 +34,6 @@ func (t *transactionUseCase) CreateTransaction(ctx context.Context, accountID in
 		amount = -amount
 	}
 
-	transaction := domain.NewTransaction(accountID, operationType, amount)
+	transaction := domain.NewTransaction(accountID, operationType, amount, time.Now())
 	return t.repo.CreateTransaction(ctx, transaction)
 }

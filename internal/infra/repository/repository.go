@@ -7,7 +7,7 @@ import (
 )
 
 type AccountRepository interface {
-	CreateAccount(ctx context.Context, account domain.Account) (int64, error)
+	CreateAccount(ctx context.Context, account *domain.Account) (int64, error)
 	GetAccount(ctx context.Context, accountID int64) (*domain.Account, error)
 }
 

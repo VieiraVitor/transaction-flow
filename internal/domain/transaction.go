@@ -1,10 +1,13 @@
 package domain
 
+import "time"
+
 type Transaction struct {
-	ID              string        `json:"id"`
-	AccountID       int64         `json:"account_id"`
-	OperationTypeID OperationType `json:"operation_type_id"`
-	Amount          float64       `json:"amount"`
+	id              int64
+	accountID       int64
+	operationTypeID OperationType
+	amount          float64
+	eventDate       time.Time
 }
 
 type OperationType int
@@ -28,10 +31,35 @@ func (o OperationType) IsPurchaseOrWithdraw() bool {
 	return o == CompraAVista || o == CompraParcelada || o == Saque
 }
 
-func NewTransaction(accountID int64, operationType OperationType, amount float64) Transaction {
-	return Transaction{
-		AccountID:       accountID,
-		OperationTypeID: operationType,
-		Amount:          amount,
+func NewTransaction(accountID int64, operationType OperationType, amount float64, eventDate ...time.Time) Transaction {
+	eDate := time.Now()
+	if len(eventDate) > 0 {
+		eDate = eventDate[0]
 	}
+	return Transaction{
+		accountID:       accountID,
+		operationTypeID: operationType,
+		amount:          amount,
+		eventDate:       eDate,
+	}
+}
+
+func (t *Transaction) ID() int64 {
+	return t.id
+}
+
+func (t *Transaction) AccountID() int64 {
+	return t.accountID
+}
+
+func (t *Transaction) OperationTypeID() OperationType {
+	return t.operationTypeID
+}
+
+func (t *Transaction) Amount() float64 {
+	return t.amount
+}
+
+func (t *Transaction) EventDate() time.Time {
+	return t.eventDate
 }

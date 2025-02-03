@@ -72,7 +72,7 @@ func TestTransactionUseCase_CreateTransaction_WhenIsPurchaseOrdWithdraw_ShouldEn
 	mockRepo.EXPECT().
 		CreateTransaction(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, transaction domain.Transaction) (int64, error) {
-			assert.Equal(t, expectedAmount, transaction.Amount)
+			assert.Equal(t, expectedAmount, transaction.Amount())
 			return int64(1), nil
 		})
 
@@ -97,7 +97,7 @@ func TestTransactionUseCase_CreateTransaction_WhenIsPayment_ShouldEnsureAmountIs
 	mockRepo.EXPECT().
 		CreateTransaction(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, transaction domain.Transaction) (int64, error) {
-			assert.Equal(t, expectedAmount, transaction.Amount)
+			assert.Equal(t, expectedAmount, transaction.Amount())
 			return int64(1), nil
 		})
 

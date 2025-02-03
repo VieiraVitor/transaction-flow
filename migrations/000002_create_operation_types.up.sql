@@ -1,6 +1,8 @@
 CREATE TABLE operation_types (
     id SERIAL PRIMARY KEY,
-    description VARCHAR(50) NOT NULL UNIQUE
+    description VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 
