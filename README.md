@@ -88,24 +88,24 @@ docker-compose up
 * **[Postgresql](https://www.postgresql.org/download/linux/ubuntu/)**
 * **[Golang](https://go.dev/doc/install)**
 
-:two: **Clone the repository**
+:one: **Clone the repository**
 ```bash
 git clone https://github.com/your-user/transaction-flow.git
 cd transaction-flow
 ```
 
-:three: **Create database**
+:two: **Create database**
 ```bash
 make create-db
 ```
 
-:four: **Run migration**
+:three: **Run migration**
 
 ```bash
 make migrate-up
 ```
 
-:five: **Run project**
+:four: **Run project**
 ```bash
 make run
 ```
