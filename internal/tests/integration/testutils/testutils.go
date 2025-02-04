@@ -14,7 +14,7 @@ import (
 	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 	"github.com/go-chi/chi/v5"
-	_ "github.com/lib/pq"
+	pq "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +28,6 @@ const (
 
 type TestContext struct {
 	DB         *sql.DB
-	Tx         *sql.Tx
 	Router     *chi.Mux
 	AccountIDs []int64
 }
@@ -41,9 +40,6 @@ func SetupTest(t *testing.T) *TestContext {
 
 	db, err := sql.Open("postgres", dsn)
 	assert.NoError(t, err, "failed to connect to database")
-
-	tx, err := db.Begin()
-	assert.NoError(t, err, "failed to begin transaction")
 
 	logger.InitLogger()
 
@@ -60,19 +56,15 @@ func SetupTest(t *testing.T) *TestContext {
 	router.Get("/accounts/{id}", accountHandler.GetAccount)
 	router.Post("/transactions", transactionHandler.CreateTransaction)
 
-	return &TestContext{DB: db, Tx: tx, Router: router, AccountIDs: []int64{}}
+	return &TestContext{DB: db, Router: router, AccountIDs: []int64{}}
 }
 
 func CleanupTest(t *testing.T, setup *TestContext) {
-	for _, id := range setup.AccountIDs {
-		_, err := setup.DB.Exec("DELETE FROM accounts WHERE id = $1", id)
-		assert.NoError(t, err, "failed to clean up account ID")
-	}
+	_, err := setup.DB.Exec("DELETE FROM transactions WHERE account_id = ANY($1)", pq.Array(setup.AccountIDs))
+	assert.NoError(t, err, "failed to clean up transactions")
 
-	err := setup.Tx.Rollback()
-	if err != nil && err != sql.ErrTxDone {
-		t.Fatalf("failed to rollback transaction: %v", err)
-	}
+	_, err = setup.DB.Exec("DELETE FROM accounts WHERE id = ANY($1)", pq.Array(setup.AccountIDs))
+	assert.NoError(t, err, "failed to clean up accounts")
 
 	setup.DB.Close()
 }

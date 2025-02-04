@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -13,7 +14,7 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Logger.Error("Panic",
+				logger.Logger.ErrorContext(context.Background(), "Panic",
 					slog.String("error", fmt.Sprintf("%v", err)),
 					slog.String("method", r.Method),
 					slog.String("path", r.URL.Path),

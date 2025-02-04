@@ -19,18 +19,6 @@ const (
 	Pagamento       OperationType = 4
 )
 
-func (o OperationType) IsValid() bool {
-	return o == CompraAVista || o == CompraParcelada || o == Saque || o == Pagamento
-}
-
-func (o OperationType) IsPayment() bool {
-	return o == Pagamento
-}
-
-func (o OperationType) IsPurchaseOrWithdraw() bool {
-	return o == CompraAVista || o == CompraParcelada || o == Saque
-}
-
 func NewTransaction(accountID int64, operationType OperationType, amount float64, eventDate ...time.Time) Transaction {
 	eDate := time.Now()
 	if len(eventDate) > 0 {
@@ -62,4 +50,16 @@ func (t *Transaction) Amount() float64 {
 
 func (t *Transaction) EventDate() time.Time {
 	return t.eventDate
+}
+
+func (o OperationType) IsValid() bool {
+	return o == CompraAVista || o == CompraParcelada || o == Saque || o == Pagamento
+}
+
+func (o OperationType) IsPayment() bool {
+	return o == Pagamento
+}
+
+func (o OperationType) IsPurchaseOrWithdraw() bool {
+	return o == CompraAVista || o == CompraParcelada || o == Saque
 }

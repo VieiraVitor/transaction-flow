@@ -3,11 +3,13 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/VieiraVitor/transaction-flow/internal/api/dto"
 	"github.com/VieiraVitor/transaction-flow/internal/api/response"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 )
 
 type TransactionHandler struct {
@@ -50,7 +52,12 @@ func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	response := dto.CreateTransactionResponse{ID: transactionID}
+	transactionResponse := dto.CreateTransactionResponse{ID: transactionID}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(transactionResponse); err != nil {
+		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
 }

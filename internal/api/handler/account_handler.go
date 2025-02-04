@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/VieiraVitor/transaction-flow/internal/api/dto"
 	"github.com/VieiraVitor/transaction-flow/internal/api/response"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 	"github.com/go-chi/chi/v5"
 )
@@ -50,9 +52,15 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		response.SendErrorResponse(w, http.StatusInternalServerError, "could not create account", err.Error())
 		return
 	}
-	response := dto.CreateAccountResponse{ID: id}
+
+	accountResponse := dto.CreateAccountResponse{ID: id}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(accountResponse); err != nil {
+		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
 }
 
 // GetAccount godoc
@@ -89,5 +97,9 @@ func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 		DocumentNumber: account.DocumentNumber(),
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(accountResponse)
+	if err := json.NewEncoder(w).Encode(accountResponse); err != nil {
+		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 }

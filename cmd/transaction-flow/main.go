@@ -60,7 +60,7 @@ func main() {
 	go func() {
 		logger.Logger.Info("Server started", "url", "http://localhost:8080")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Logger.Error("Failed to start server", "error", err.Error())
+			logger.Logger.ErrorContext(context.Background(), "Failed to start server", "error", err.Error())
 		}
 	}()
 
@@ -71,7 +71,7 @@ func main() {
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		logger.Logger.Error("Failed to stop server", "error", err.Error())
+		logger.Logger.ErrorContext(ctx, "Failed to stop server", "error", err.Error())
 	} else {
 		logger.Logger.Info("Sever finished successfully")
 	}

@@ -27,7 +27,7 @@ func (r *accountRepository) CreateAccount(ctx context.Context, account *domain.A
 	row := r.db.QueryRow(query, account.DocumentNumber())
 	err := row.Scan(&id)
 	if err != nil {
-		logger.Logger.Error("error creating account", slog.String("document_number", account.DocumentNumber()), slog.String("error", err.Error()))
+		logger.Logger.ErrorContext(ctx, "error creating account", slog.String("document_number", account.DocumentNumber()), slog.String("error", err.Error()))
 		return 0, fmt.Errorf("failed to create account: %w", err)
 	}
 	return id, err
@@ -40,10 +40,10 @@ func (r *accountRepository) GetAccount(ctx context.Context, accountID int64) (*d
 	account, err := r.scanAccount(row)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			logger.Logger.Error("account not found", slog.String("error", err.Error()))
+			logger.Logger.ErrorContext(ctx, "account not found", slog.String("error", err.Error()))
 			return nil, ErrAccountNotFound
 		}
-		logger.Logger.Error("error getting account", slog.String("error", err.Error()))
+		logger.Logger.ErrorContext(ctx, "error getting account", slog.String("error", err.Error()))
 		return nil, err
 	}
 

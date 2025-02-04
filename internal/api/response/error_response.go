@@ -1,8 +1,12 @@
 package response
 
 import (
+	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
+
+	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 )
 
 type ErrorResponse struct {
@@ -21,5 +25,10 @@ func SendErrorResponse(w http.ResponseWriter, statusCode int, errMsg, descriptio
 		Description: description,
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
 }

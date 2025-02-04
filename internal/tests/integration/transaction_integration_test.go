@@ -43,7 +43,7 @@ func TestCreateTransaction_WhenValidInput_ShouldReturn201(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Greater(t, transactionResponse.ID, int64(0))
 
-	assertTransaction(setup, t, body, transactionResponse)
+	assertCreateTransaction(setup, t, body, transactionResponse)
 }
 
 func TestCreateTransaction_WhenCreateMoreThanOneTransactionSuccessfully_ShouldReturn201(t *testing.T) {
@@ -51,7 +51,7 @@ func TestCreateTransaction_WhenCreateMoreThanOneTransactionSuccessfully_ShouldRe
 	setup := testutils.SetupTest(t)
 	defer testutils.CleanupTest(t, setup)
 
-	// Create a new account
+	// Create new account
 	w, req := testutils.CreateRequest(t, http.MethodPost, "/accounts", dto.CreateAccountRequest{DocumentNumber: "01101101001"})
 	setup.Router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusCreated, w.Code)
@@ -76,7 +76,7 @@ func TestCreateTransaction_WhenCreateMoreThanOneTransactionSuccessfully_ShouldRe
 	err = json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.NoError(t, err)
 	assert.Greater(t, resp.ID, int64(0))
-	assertTransaction(setup, t, body, resp)
+	assertCreateTransaction(setup, t, body, resp)
 
 	body2 := dto.CreateTransactionRequest{
 		AccountID:       response.ID,
@@ -93,7 +93,7 @@ func TestCreateTransaction_WhenCreateMoreThanOneTransactionSuccessfully_ShouldRe
 	err = json.Unmarshal(w.Body.Bytes(), &resp2)
 	assert.NoError(t, err)
 	assert.Greater(t, resp2.ID, int64(0))
-	assertTransaction(setup, t, body2, resp2)
+	assertCreateTransaction(setup, t, body2, resp2)
 }
 
 func TestCreateTransaction_WhenInvalidInput_ShouldReturn201(t *testing.T) {
@@ -156,7 +156,7 @@ func TestCreateTransaction_WhenCreateTransactionFails_ShouldReturn500(t *testing
 	assert.Equal(t, "failed to create transaction: sql: database is closed", errorResponse.Description)
 }
 
-func assertTransaction(setup *testutils.TestContext,
+func assertCreateTransaction(setup *testutils.TestContext,
 	t *testing.T,
 	requestBody dto.CreateTransactionRequest,
 	transactionResponse dto.CreateTransactionResponse) {
