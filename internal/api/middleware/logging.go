@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// ResponseWriter customizado para capturar status code e tamanho da resposta
+// Custom ResponseWriter to capture status code and response body
 type responseLogger struct {
 	http.ResponseWriter
 	statusCode int
