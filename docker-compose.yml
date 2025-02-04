@@ -14,7 +14,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      DB_NAME: transactions
+      DB_NAME: transaction_flow
     networks:
       - backend
 
@@ -25,7 +25,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: transactions
+      POSTGRES_DB: transaction_flow
     ports:
       - "5432:5432"
     networks:
@@ -42,7 +42,7 @@ services:
       - ./migrations:/migrations
     command: [
       "-path", "/migrations",
-      "-database", "postgres://postgres:postgres@db:5432/transactions?sslmode=disable",
+      "-database", "postgres://postgres:postgres@db:5432/transaction_flow?sslmode=disable",
       "up"
     ]
     restart: on-failure

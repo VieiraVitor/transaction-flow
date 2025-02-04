@@ -36,7 +36,7 @@ This project uses the following technologies:
 │   │   ├── handlers/             # Handlers for HTTP requests
 │   │   ├── middleware/           # Middlewares (logging, recovery)
 │   │   ├── dto/                  # Request/response structures
-│   │   ├── response/             # Error formatting
+│   │   ├── response/             # Api response
 │   │
 │   ├── application/             # Business logic (use cases)
 │   │   ├── usecase/               # Use cases (Account, Transaction)
@@ -47,6 +47,8 @@ This project uses the following technologies:
 │   │   ├── repository/            # Database access
 │   │   ├── logger/                # Logging configuration
 │   │   ├── database/              # Connect to database
+│   │
+│   ├── mocks/                   # Mocks configuration
 │   │
 │   ├── tests/                   # Integration tests
 │   │   ├── integration/          # Integration test cases
@@ -80,6 +82,33 @@ cd transaction-flow
 docker-compose up
 ```
 📌 This will start the required services, including the database and application.
+
+### **How to run without docker compose**
+##### :heavy_exclamation_mark: You will need to have installed:
+* **[Postgresql](https://www.postgresql.org/download/linux/ubuntu/)**
+* **[Golang](https://go.dev/doc/install)**
+
+:two: **Clone the repository**
+```bash
+git clone https://github.com/your-user/transaction-flow.git
+cd transaction-flow
+```
+
+:three: **Create database**
+```bash
+make create-db
+```
+
+:four: **Run migration**
+
+```bash
+make migrate-up
+```
+
+:five: **Run project**
+```bash
+make run
+```
 
 ### **📌 How to run tests**
 **To run all tests (including integration tests)**
