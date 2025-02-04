@@ -61,7 +61,6 @@ This project uses the following technologies:
 
 ## 🚀 **How to Run the Project Locally**
 
-### **📌 Prerequisites**
 
 Before you begin, you will need to have installed:
 
@@ -82,7 +81,8 @@ docker-compose up -d
 ```
 📌 This will start the required services, including the database and application.
 
-3️⃣ **Run all tests (including integration tests)**
+### **📌 Run tests**
+**Run all tests (including integration tests)**
 ```bash
 docker-compose up -d  # Required to run integration tests
 go test ./...
