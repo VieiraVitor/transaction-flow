@@ -32,3 +32,14 @@ func SendErrorResponse(w http.ResponseWriter, statusCode int, errMsg, descriptio
 	}
 
 }
+
+func SendJSONResponse(ctx context.Context, w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		logger.Logger.ErrorContext(ctx, "failed to encode response", slog.Any("data", data), slog.String("error", err.Error()))
+		http.Error(w, `{"error":"internal server error"}`, http.StatusInternalServerError)
+	}
+}

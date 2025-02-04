@@ -1,4 +1,4 @@
-# Fase de Build
+# Build
 FROM golang:1.23 AS build
 
 WORKDIR /app
@@ -11,12 +11,11 @@ COPY . .
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
     go build -o transaction-flow ./cmd/transaction-flow
 
-# Fase de Execução
+# Execute
 FROM alpine:latest
 
 WORKDIR /app
 
-# Instala certificados para conexões HTTPS seguras
 RUN apk --no-cache add ca-certificates
 
 COPY --from=build /app/transaction-flow /app/transaction-flow

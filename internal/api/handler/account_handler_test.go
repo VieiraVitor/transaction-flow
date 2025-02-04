@@ -146,7 +146,7 @@ func TestAccountHandler_CreateAccount_WhenRequestIsInvalid_ShouldReturn400(t *te
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, errorResponse.StatusCode)
 	assert.Equal(t, "invalid request", errorResponse.Error)
-	assert.Equal(t, "invalid character 'a' after object key:value pair", errorResponse.Description)
+	assert.Contains(t, errorResponse.Description, "malformed request")
 
 }
 

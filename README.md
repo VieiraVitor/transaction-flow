@@ -77,18 +77,17 @@ cd transaction-flow
 
 2️⃣ **Start the project containers (API, database, and migrations)**
 ```bash
-docker-compose up -d
+docker-compose up
 ```
 📌 This will start the required services, including the database and application.
 
-### **📌 Run tests**
-**Run all tests (including integration tests)**
+### **📌 How to run tests**
+**To run all tests (including integration tests)**
 ```bash
 docker-compose up -d  # Required to run integration tests
-go test ./...
+make test
 ```
 📌 Running **integration tests** requires the database to be up and running via Docker Compose.
-
 
 ---
 

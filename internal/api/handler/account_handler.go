@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log/slog"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/VieiraVitor/transaction-flow/internal/api/dto"
 	"github.com/VieiraVitor/transaction-flow/internal/api/response"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
-	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 	"github.com/VieiraVitor/transaction-flow/internal/infra/repository"
 	"github.com/go-chi/chi/v5"
 )
@@ -30,15 +29,18 @@ func NewAccountHandler(useCase usecase.AccountUseCase) *AccountHandler {
 // @Tags Accounts
 // @Accept  json
 // @Produce  json
-// @Param account body dto.CreateAccountRequest true "Account Data"
-// @Success 201 {object} dto.CreateAccountResponse "Account ID"
+// @Param account body dto.CreateAccountRequest true "Account creation request"
+// @Success 201 {object} dto.CreateAccountResponse "Account Created"
 // @Failure 400 {object} response.ErrorResponse "Invalid Request"
+// @Failure 422 {object} response.ErrorResponse "Validation Error"
 // @Failure 409 {object} response.ErrorResponse "Account Already Exists"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
 // @Router /accounts [post]
 func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 	var req dto.CreateAccountRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.SendErrorResponse(w, http.StatusBadRequest, "invalid request", err.Error())
+		response.SendErrorResponse(w, http.StatusBadRequest, "invalid request", fmt.Sprintf("malformed request :%v", err))
 		return
 	}
 
@@ -47,34 +49,29 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.useCase.CreateAccount(context.Background(), req.DocumentNumber)
+	id, err := h.useCase.CreateAccount(ctx, req.DocumentNumber)
 	if err != nil {
 		response.SendErrorResponse(w, http.StatusInternalServerError, "could not create account", err.Error())
 		return
 	}
 
 	accountResponse := dto.CreateAccountResponse{ID: id}
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(accountResponse); err != nil {
-		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
-
+	response.SendJSONResponse(ctx, w, http.StatusCreated, accountResponse)
 }
 
 // GetAccount godoc
-// @Summary Get account by ID
-// @Description Retrieves account information using an account ID
+// @Summary Retrieve an account
+// @Description Fetches account details by ID
 // @Tags Accounts
 // @Accept  json
 // @Produce  json
 // @Param id path int true "Account ID"
-// @Success 200 {object} dto.GetAccountResponse "Account Data"
-// @Failure 400 {object} response.ErrorResponse "Invalid Account ID"
+// @Success 200 {object} dto.GetAccountResponse "Account Details"
 // @Failure 404 {object} response.ErrorResponse "Account Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
 // @Router /accounts/{id} [get]
 func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 	idParam := chi.URLParam(r, "id")
 	accountID, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
@@ -82,7 +79,7 @@ func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := h.useCase.GetAccount(context.Background(), accountID)
+	account, err := h.useCase.GetAccount(ctx, accountID)
 	if err != nil {
 		if errors.Is(err, repository.ErrAccountNotFound) {
 			response.SendErrorResponse(w, http.StatusNotFound, "account not found", err.Error())
@@ -96,10 +93,5 @@ func (h *AccountHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
 		AccountID:      account.ID(),
 		DocumentNumber: account.DocumentNumber(),
 	}
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(accountResponse); err != nil {
-		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
+	response.SendJSONResponse(ctx, w, http.StatusOK, accountResponse)
 }

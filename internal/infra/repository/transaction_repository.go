@@ -25,7 +25,15 @@ func (r *transactionRepository) CreateTransaction(ctx context.Context, transacti
 	row := r.db.QueryRow(query, transaction.AccountID(), transaction.OperationTypeID(), transaction.Amount(), transaction.EventDate())
 	err := row.Scan((&id))
 	if err != nil {
-		logger.Logger.ErrorContext(ctx, "Error creating transaction", slog.String("error", err.Error()))
+		logger.Logger.ErrorContext(
+			ctx,
+			"error creating transaction",
+			slog.Int64("accountID", transaction.AccountID()),
+			slog.Any("operationTypeID", transaction.OperationTypeID()),
+			slog.Float64("amount", transaction.Amount()),
+			slog.Time("eventDate", transaction.EventDate()),
+			slog.String("error", err.Error()),
+		)
 		return 0, fmt.Errorf("failed to create transaction: %w", err)
 	}
 	return id, nil

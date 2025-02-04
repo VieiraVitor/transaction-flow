@@ -3,32 +3,40 @@ definitions:
   dto.CreateAccountRequest:
     properties:
       document_number:
+        example: "1234567890"
         type: string
     type: object
   dto.CreateAccountResponse:
     properties:
       id:
+        example: 1
         type: integer
     type: object
   dto.CreateTransactionRequest:
     properties:
       account_id:
+        example: 1
         type: integer
       amount:
+        example: 100
         type: number
       operation_type_id:
+        example: 4
         type: integer
     type: object
   dto.CreateTransactionResponse:
     properties:
       id:
+        example: 1
         type: integer
     type: object
   dto.GetAccountResponse:
     properties:
       account_id:
+        example: 1
         type: integer
       document_number:
+        example: "1234567890"
         type: string
     type: object
   response.ErrorResponse:
@@ -53,7 +61,7 @@ paths:
       - application/json
       description: Creates a new account with a document number
       parameters:
-      - description: Account Data
+      - description: Account creation request
         in: body
         name: account
         required: true
@@ -63,7 +71,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: Account ID
+          description: Account Created
           schema:
             $ref: '#/definitions/dto.CreateAccountResponse'
         "400":
@@ -74,6 +82,14 @@ paths:
           description: Account Already Exists
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
       summary: Create an account
       tags:
       - Accounts
@@ -81,7 +97,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieves account information using an account ID
+      description: Fetches account details by ID
       parameters:
       - description: Account ID
         in: path
@@ -92,18 +108,18 @@ paths:
       - application/json
       responses:
         "200":
-          description: Account Data
+          description: Account Details
           schema:
             $ref: '#/definitions/dto.GetAccountResponse'
-        "400":
-          description: Invalid Account ID
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
         "404":
           description: Account Not Found
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Get account by ID
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Retrieve an account
       tags:
       - Accounts
   /transactions:
@@ -112,7 +128,7 @@ paths:
       - application/json
       description: Registers a new financial transaction
       parameters:
-      - description: Transaction Data
+      - description: Transaction Request
         in: body
         name: transaction
         required: true
@@ -122,7 +138,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: Transaction ID
+          description: Transaction Created
           schema:
             $ref: '#/definitions/dto.CreateTransactionResponse'
         "400":
@@ -130,7 +146,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "422":
-          description: Validation Error
+          description: Validation Failed
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":

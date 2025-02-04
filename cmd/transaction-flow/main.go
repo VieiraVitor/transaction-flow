@@ -73,6 +73,6 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		logger.Logger.ErrorContext(ctx, "Failed to stop server", "error", err.Error())
 	} else {
-		logger.Logger.Info("Sever finished successfully")
+		logger.Logger.Info("Server finished successfully")
 	}
 }

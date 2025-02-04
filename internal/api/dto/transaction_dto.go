@@ -3,13 +3,13 @@ package dto
 import "errors"
 
 type CreateTransactionRequest struct {
-	AccountID       int64   `json:"account_id"`
-	OperationTypeID int     `json:"operation_type_id"`
-	Amount          float64 `json:"amount"`
+	AccountID       int64   `json:"account_id" example:"1"`
+	OperationTypeID int     `json:"operation_type_id" example:"4"`
+	Amount          float64 `json:"amount" example:"100"`
 }
 
 type CreateTransactionResponse struct {
-	ID int64 `json:"id"`
+	ID int64 `json:"id" example:"1"`
 }
 
 func (c *CreateTransactionRequest) Validate() error {

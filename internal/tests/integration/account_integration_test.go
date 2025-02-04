@@ -56,6 +56,28 @@ func TestCreateAccount_WhenDocumentNumberIsEmpty_ShouldReturn422(t *testing.T) {
 	assert.Equal(t, "document_number is mandatory", errorResponse.Description)
 }
 
+func TestCreateAccount_WhenInvalidInput_ShouldReturn400(t *testing.T) {
+	// Arrange
+	setup := testutils.SetupTest(t)
+	defer testutils.CleanupTest(t, setup)
+
+	body := []byte(`{"document_number": number}`)
+
+	w, req := testutils.CreateRequest(t, http.MethodPost, "/accounts", body)
+
+	// Act
+	setup.Router.ServeHTTP(w, req)
+
+	// Arrange
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, errorResponse.StatusCode)
+	assert.Equal(t, "invalid request", errorResponse.Error)
+	assert.Contains(t, errorResponse.Description, "malformed request")
+}
+
 func TestCreateAccount_WhenDuplicateDocumentNumber_ShouldReturn500(t *testing.T) {
 	// Arrange
 	setup := testutils.SetupTest(t)

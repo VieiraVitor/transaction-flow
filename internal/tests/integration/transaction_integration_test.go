@@ -96,7 +96,29 @@ func TestCreateTransaction_WhenCreateMoreThanOneTransactionSuccessfully_ShouldRe
 	assertCreateTransaction(setup, t, body2, resp2)
 }
 
-func TestCreateTransaction_WhenInvalidInput_ShouldReturn201(t *testing.T) {
+func TestCreateTransaction_WhenInvalidInput_ShouldReturn400(t *testing.T) {
+	// Arrange
+	setup := testutils.SetupTest(t)
+	defer testutils.CleanupTest(t, setup)
+
+	body := []byte(`{"account_id": invalid,}`)
+
+	w, req := testutils.CreateRequest(t, http.MethodPost, "/transactions", body)
+
+	// Act
+	setup.Router.ServeHTTP(w, req)
+
+	// Arrange
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	var errorResponse response.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, errorResponse.StatusCode)
+	assert.Equal(t, "invalid request", errorResponse.Error)
+	assert.Contains(t, errorResponse.Description, "malformed request")
+}
+
+func TestCreateTransaction_WhenValidationFailed_ShouldReturn422(t *testing.T) {
 	// Arrange
 	setup := testutils.SetupTest(t)
 	defer testutils.CleanupTest(t, setup)

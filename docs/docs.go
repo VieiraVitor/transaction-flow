@@ -30,7 +30,7 @@ const docTemplate = `{
                 "summary": "Create an account",
                 "parameters": [
                     {
-                        "description": "Account Data",
+                        "description": "Account creation request",
                         "name": "account",
                         "in": "body",
                         "required": true,
@@ -41,7 +41,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Account ID",
+                        "description": "Account Created",
                         "schema": {
                             "$ref": "#/definitions/dto.CreateAccountResponse"
                         }
@@ -57,13 +57,25 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
                     }
                 }
             }
         },
         "/accounts/{id}": {
             "get": {
-                "description": "Retrieves account information using an account ID",
+                "description": "Fetches account details by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -73,7 +85,7 @@ const docTemplate = `{
                 "tags": [
                     "Accounts"
                 ],
-                "summary": "Get account by ID",
+                "summary": "Retrieve an account",
                 "parameters": [
                     {
                         "type": "integer",
@@ -85,19 +97,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Account Data",
+                        "description": "Account Details",
                         "schema": {
                             "$ref": "#/definitions/dto.GetAccountResponse"
                         }
                     },
-                    "400": {
-                        "description": "Invalid Account ID",
+                    "404": {
+                        "description": "Account Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
-                    "404": {
-                        "description": "Account Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -120,7 +132,7 @@ const docTemplate = `{
                 "summary": "Create a transaction",
                 "parameters": [
                     {
-                        "description": "Transaction Data",
+                        "description": "Transaction Request",
                         "name": "transaction",
                         "in": "body",
                         "required": true,
@@ -131,7 +143,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Transaction ID",
+                        "description": "Transaction Created",
                         "schema": {
                             "$ref": "#/definitions/dto.CreateTransactionResponse"
                         }
@@ -143,7 +155,7 @@ const docTemplate = `{
                         }
                     },
                     "422": {
-                        "description": "Validation Error",
+                        "description": "Validation Failed",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -163,7 +175,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "document_number": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1234567890"
                 }
             }
         },
@@ -171,7 +184,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -179,13 +193,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "amount": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 100
                 },
                 "operation_type_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 4
                 }
             }
         },
@@ -193,7 +210,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -201,10 +219,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "document_number": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1234567890"
                 }
             }
         },

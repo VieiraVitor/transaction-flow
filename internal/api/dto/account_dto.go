@@ -5,16 +5,16 @@ import (
 )
 
 type CreateAccountRequest struct {
-	DocumentNumber string `json:"document_number"`
+	DocumentNumber string `json:"document_number" example:"1234567890"`
 }
 
 type CreateAccountResponse struct {
-	ID int64 `json:"id"`
+	ID int64 `json:"id" example:"1"`
 }
 
 type GetAccountResponse struct {
-	AccountID      int64  `json:"account_id"`
-	DocumentNumber string `json:"document_number"`
+	AccountID      int64  `json:"account_id" example:"1"`
+	DocumentNumber string `json:"document_number" example:"1234567890"`
 }
 
 func (c *CreateAccountRequest) Validate() error {

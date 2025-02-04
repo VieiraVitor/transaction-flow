@@ -3,13 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"log/slog"
+	"fmt"
 	"net/http"
 
 	"github.com/VieiraVitor/transaction-flow/internal/api/dto"
 	"github.com/VieiraVitor/transaction-flow/internal/api/response"
 	"github.com/VieiraVitor/transaction-flow/internal/application/usecase"
-	"github.com/VieiraVitor/transaction-flow/internal/infra/logger"
 )
 
 type TransactionHandler struct {
@@ -28,16 +27,16 @@ func NewTransactionHandler(useCase usecase.TransactionUseCase) *TransactionHandl
 // @Tags Transactions
 // @Accept  json
 // @Produce  json
-// @Param transaction body dto.CreateTransactionRequest true "Transaction Data"
-// @Success 201 {object} dto.CreateTransactionResponse "Transaction ID"
+// @Param transaction body dto.CreateTransactionRequest true "Transaction Request"
+// @Success 201 {object} dto.CreateTransactionResponse "Transaction Created"
 // @Failure 400 {object} response.ErrorResponse "Invalid Request"
-// @Failure 422 {object} response.ErrorResponse "Validation Error"
+// @Failure 422 {object} response.ErrorResponse "Validation Failed"
 // @Failure 500 {object} response.ErrorResponse "Internal Server Error"
 // @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateTransactionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.SendErrorResponse(w, http.StatusBadRequest, "invalid request", err.Error())
+		response.SendErrorResponse(w, http.StatusBadRequest, "invalid request", fmt.Sprintf("malformed request :%v", err))
 		return
 	}
 
@@ -53,11 +52,5 @@ func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 	}
 
 	transactionResponse := dto.CreateTransactionResponse{ID: transactionID}
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(transactionResponse); err != nil {
-		logger.Logger.ErrorContext(context.Background(), "failed to encode response", slog.String("error", err.Error()))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
-
+	response.SendJSONResponse(context.Background(), w, http.StatusCreated, transactionResponse)
 }

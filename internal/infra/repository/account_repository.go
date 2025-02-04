@@ -40,10 +40,10 @@ func (r *accountRepository) GetAccount(ctx context.Context, accountID int64) (*d
 	account, err := r.scanAccount(row)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			logger.Logger.ErrorContext(ctx, "account not found", slog.String("error", err.Error()))
+			logger.Logger.ErrorContext(ctx, "account not found", slog.Int64("account_id", accountID), slog.String("error", err.Error()))
 			return nil, ErrAccountNotFound
 		}
-		logger.Logger.ErrorContext(ctx, "error getting account", slog.String("error", err.Error()))
+		logger.Logger.ErrorContext(ctx, "error getting account", slog.Int64("account_id", accountID), slog.String("error", err.Error()))
 		return nil, err
 	}
 
